@@ -59,14 +59,36 @@ test("dummy returns one", () => {
 
 describe("total likes", () => {
   test("empty blog list gives zero", () => {
-    expect(listHelper.totalLikes([])).toBe(0)
-  })
+    expect(listHelper.totalLikes([])).toBe(0);
+  });
   test("one-blog list gives this blog likes", () => {
     result = listHelper.totalLikes(blogs.slice(0, 1));
     expect(result).toBe(blogs[0].likes);
   });
   test("right calculation on normal list", () => {
-    result = listHelper.totalLikes(blogs)
-    expect(result).toBe(36)
-  })
+    result = listHelper.totalLikes(blogs);
+    expect(result).toBe(36);
+  });
+});
+
+describe("favorite", () => {
+  test("empty blog list gives null", () => {
+    expect(listHelper.favoriteBlog([])).toBe(null);
+  });
+  test("one-blog list gives this blog", () => {
+    result = listHelper.favoriteBlog(blogs.slice(0, 1));
+    expect(result).toEqual({
+      title: "React patterns",
+      author: "Michael Chan",
+      likes: 7,
+    });
+  });
+  test("right calculation on normal list", () => {
+    favblog = {
+      title: "Canonical string reduction",
+      author: "Edsger W. Dijkstra",
+      likes: 12,
+    };
+    expect(listHelper.favoriteBlog(blogs)).toEqual(favblog);
+  });
 });
