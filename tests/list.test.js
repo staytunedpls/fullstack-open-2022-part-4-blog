@@ -92,3 +92,43 @@ describe("favorite", () => {
     expect(listHelper.favoriteBlog(blogs)).toEqual(favblog);
   });
 });
+
+describe("most blogs", () => {
+  test("empty blog list gives null", () => {
+    expect(listHelper.mostBlogs([])).toBe(null);
+  });
+  test("one-blog list gives this author and one blog", () => {
+    result = listHelper.mostBlogs(blogs.slice(0, 1));
+    expect(result).toEqual({
+      author: "Michael Chan",
+      blogs: 1,
+    });
+  });
+  test("right calculation on normal list", () => {
+    popular = {
+      author: "Robert C. Martin",
+      blogs: 3,
+    };
+    expect(listHelper.mostBlogs(blogs)).toEqual(popular);
+  });
+});
+
+describe("most likes", () => {
+  test("empty blog list gives null", () => {
+    expect(listHelper.mostLikes([])).toBe(null);
+  });
+  test("one-blog list gives this author and its likes", () => {
+    result = listHelper.mostLikes(blogs.slice(0, 1));
+    expect(result).toEqual({
+      author: "Michael Chan",
+      likes: 7,
+    });
+  });
+  test("right calculation on normal list", () => {
+    popular = {
+      author: "Edsger W. Dijkstra",
+      likes: 17,
+    };
+    expect(listHelper.mostLikes(blogs)).toEqual(popular);
+  });
+});
