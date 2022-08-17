@@ -16,7 +16,7 @@ test("GET returns all blogs", async () => {
   expect(response.body).toHaveLength(helper.initialBlogs.length);
 });
 
-test("blogs have 'id' property", async () => {
+test("GET blogs have 'id' property", async () => {
   const response = await api.get("/api/blogs");
   const first_blog = response.body[0];
   expect(first_blog.id).toBeDefined();
@@ -38,7 +38,7 @@ test("POST works for correct blogs", async () => {
   expect(blogsAfter).toHaveLength(helper.initialBlogs.length + 1);
 });
 
-test("Default likes is 0", async () => {
+test("POST - default likes is 0", async () => {
   const newBlog = {
     title: "Blog no likes info",
     author: "Author no likes info",
@@ -51,6 +51,42 @@ test("Default likes is 0", async () => {
     .expect("Content-Type", /application\/json/);
   const blogsAfter = await helper.blogsInDb();
   expect(blogsAfter[blogsAfter.length - 1].likes).toBe(0);
+});
+
+test("POST without title and url results in 400", async () => {
+  const hasNoTitleHasUrl = {
+    author: "No title but with url",
+    url: "basic url",
+    likes: 10,
+  };
+  await api
+    .post("/api/blogs")
+    .send(hasNoTitleHasUrl)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+
+  const hasTitleHasNoUrl = {
+    author: "No url but with title",
+    title: "basic title",
+    likes: 20,
+  };
+  await api
+    .post("/api/blogs")
+    .send(hasTitleHasNoUrl)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+
+  const hasNoTitleHasNoUrl = {
+    author: "No title and no url",
+    likes: 50,
+  };
+  await api
+    .post("/api/blogs")
+    .send(hasNoTitleHasNoUrl)
+    .expect(400)
+  
+  const blogsAtEnd = await helper.blogsInDb();
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 2);
 });
 
 afterAll(() => {
