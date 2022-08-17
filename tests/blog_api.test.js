@@ -80,13 +80,31 @@ test("POST without title and url results in 400", async () => {
     author: "No title and no url",
     likes: 50,
   };
-  await api
-    .post("/api/blogs")
-    .send(hasNoTitleHasNoUrl)
-    .expect(400)
-  
+  await api.post("/api/blogs").send(hasNoTitleHasNoUrl).expect(400);
+
   const blogsAtEnd = await helper.blogsInDb();
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 2);
+});
+
+test("DELETE existing blog works", async () => {
+  const blogsAtStart = await helper.blogsInDb();
+  blogToBeDeleted = blogsAtStart[0];
+  await api.delete(`/api/blogs/${blogToBeDeleted.id}`).expect(204);
+
+  const blogsAtEnd = await helper.blogsInDb();
+  expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1);
+
+  blogTitles = blogsAtEnd.map((blog) => blog.title);
+  expect(blogTitles).not.toContain(blogToBeDeleted.title);
+});
+
+test("DELETE non-existing blog returns 204", async () => {
+  const blogsAtStart = await helper.blogsInDb();
+  non_existent_id = "62fcae649d68dcc58d9b7af7";
+  await api.delete(`/api/blogs/${non_existent_id}`).expect(204);
+
+  const blogsAtEnd = await helper.blogsInDb();
+  expect(blogsAtEnd).toHaveLength(blogsAtStart.length);
 });
 
 afterAll(() => {
