@@ -4,11 +4,27 @@ const app = require("../app");
 const api = supertest(app);
 
 const User = require("../models/user");
+const Blog = require("../models/blog");
 const helper = require("./test_helper");
 
 beforeEach(async () => {
   await User.deleteMany({});
   await User.insertMany(helper.initialUsers);
+  rawUsersAdded = await User.find({});
+
+  blogsToAdd = helper.initialBlogs.map((blog) => {
+    return { ...blog, user: rawUsersAdded[0]._id };
+  });
+  await Blog.deleteMany({});
+  await Blog.insertMany(blogsToAdd);
+
+  rawUsersAdded = await User.find({});
+  blogsAdded = await Blog.find({});
+  firstUser = rawUsersAdded[0];
+  await User.findOneAndUpdate(
+    { username: firstUser.username },
+    { blogs: blogsAdded }
+  );
 });
 
 test("getting all users works", async () => {

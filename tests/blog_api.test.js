@@ -4,14 +4,22 @@ const app = require("../app");
 const api = supertest(app);
 
 const Blog = require("../models/blog");
+const User = require("../models/user");
 const helper = require("./test_helper");
 
 beforeEach(async () => {
+  await User.deleteMany({});
+  await User.insertMany(helper.initialUsers);
+  rawUsersAdded = await User.find({})
+
+  blogsToAdd = helper.initialBlogs.map((blog) => {
+      return { ...blog, user: rawUsersAdded[0]._id };
+    })
   await Blog.deleteMany({});
-  await Blog.insertMany(helper.initialBlogs);
+  await Blog.insertMany(blogsToAdd)
 });
 
-describe("GET testing", () => {
+describe("GET blog testing", () => {
   test("GET returns all blogs", async () => {
     const response = await api.get("/api/blogs");
     expect(response.body).toHaveLength(helper.initialBlogs.length);
@@ -24,7 +32,7 @@ describe("GET testing", () => {
   });
 });
 
-describe("POST testing", () => {
+describe("POST blog testing", () => {
   test("POST works for correct blogs", async () => {
     const newBlog = {
       title: "POST test",
@@ -90,7 +98,7 @@ describe("POST testing", () => {
   });
 });
 
-describe("DELETE testing", () => {
+describe("DELETE blog testing", () => {
   test("DELETE existing blog works", async () => {
     const blogsAtStart = await helper.blogsInDb();
     blogToBeDeleted = blogsAtStart[0];
@@ -113,7 +121,7 @@ describe("DELETE testing", () => {
   });
 });
 
-describe("PUT testing", () => {
+describe("PUT blog testing", () => {
   test("PUT on existing id works", async () => {
     const blogsAtStart = await helper.blogsInDb();
     const blogToUpdate = blogsAtStart[0];

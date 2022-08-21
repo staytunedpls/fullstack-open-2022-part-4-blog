@@ -18,12 +18,12 @@ const initialUsers = [
   {
     username: "Test username 1",
     name: "Test name 1",
-    password: "Test password 1"
+    password: "Test password 1",
   },
   {
     username: "Test username 2",
     name: "Test name 2",
-    password: "Test password 2"
+    password: "Test password 2",
   },
 ];
 
@@ -41,5 +41,5 @@ module.exports = {
   initialBlogs,
   blogsInDb,
   initialUsers,
-  usersInDb
+  usersInDb,
 };
