@@ -8,6 +8,7 @@ require("express-async-errors");
 
 const BlogsRouter = require("./controllers/blogs");
 const UsersRouter = require("./controllers/users");
+const LoginRouter = require("./controllers/login");
 const logger = require("./utils/logger");
 const middleware = require("./utils/middleware");
 
@@ -24,6 +25,7 @@ app.use(cors());
 app.use(express.json());
 app.use(middleware.requestInfoLogger);
 
+app.use("/api/login", LoginRouter);
 app.use("/api/blogs", BlogsRouter);
 app.use("/api/users", UsersRouter);
 

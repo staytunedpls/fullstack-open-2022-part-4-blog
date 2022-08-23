@@ -6,6 +6,7 @@ const api = supertest(app);
 const User = require("../models/user");
 const Blog = require("../models/blog");
 const helper = require("./test_helper");
+const bcrypt = require("bcrypt");
 
 beforeEach(async () => {
   await User.deleteMany({});
@@ -33,6 +34,18 @@ test("getting all users works", async () => {
     .expect(200)
     .expect("Content-Type", /application\/json/);
   expect(response.body).toHaveLength(helper.initialUsers.length);
+});
+
+test("POST valid user", async () => {
+  const newUser = {
+    username: "username",
+    password: "password",
+  };
+
+  await api.post("/api/users").send(newUser).expect(201);
+
+  const usersAfter = await helper.usersInDb();
+  expect(usersAfter).toHaveLength(helper.initialUsers.length + 1);
 });
 
 describe("POST invalid user", () => {
