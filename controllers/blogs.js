@@ -13,8 +13,8 @@ BlogsRouter.get("/", async (request, response) => {
 });
 
 BlogsRouter.post("/", async (request, response) => {
-  const { token, title, url, author, likes } = request.body;
-  const decodedToken = await jwt.verify(token, process.env.JWT_SECRET);
+  const { title, url, author, likes } = request.body;
+  const decodedToken = await jwt.verify(request.token, process.env.JWT_SECRET);
   console.log(decodedToken);
 
   if (!decodedToken.id) {
