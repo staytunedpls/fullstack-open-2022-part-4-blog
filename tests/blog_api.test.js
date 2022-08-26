@@ -27,6 +27,16 @@ beforeEach(async () => {
   );
 });
 
+const getFirstUserToken = async () => {
+  const firstUserInfo = {
+    username: helper.initialUsers[0].username,
+    password: helper.initialUsers[0].password,
+  };
+  console.log("First user info", firstUserInfo);
+  const response = await api.post("/api/login").send(firstUserInfo);
+  return response.body.token;
+};
+
 describe("GET blog testing", () => {
   test("GET returns all blogs", async () => {
     const response = await api.get("/api/blogs");
@@ -50,6 +60,7 @@ describe("POST blog testing", () => {
 
     await api
       .post("/api/blogs")
+      .set("Authorization", "bearer " + (await getFirstUserToken()))
       .send(newBlog)
       .expect(201)
       .expect("Content-Type", /application\/json/);
@@ -65,6 +76,7 @@ describe("POST blog testing", () => {
 
     await api
       .post("/api/blogs")
+      .set("Authorization", "bearer " + (await getFirstUserToken()))
       .send(newBlog)
       .expect(201)
       .expect("Content-Type", /application\/json/);
@@ -80,6 +92,7 @@ describe("POST blog testing", () => {
     };
     await api
       .post("/api/blogs")
+      .set("Authorization", "bearer " + (await getFirstUserToken()))
       .send(hasNoTitleHasUrl)
       .expect(201)
       .expect("Content-Type", /application\/json/);
@@ -91,6 +104,7 @@ describe("POST blog testing", () => {
     };
     await api
       .post("/api/blogs")
+      .set("Authorization", "bearer " + (await getFirstUserToken()))
       .send(hasTitleHasNoUrl)
       .expect(201)
       .expect("Content-Type", /application\/json/);
@@ -99,7 +113,11 @@ describe("POST blog testing", () => {
       author: "No title and no url",
       likes: 50,
     };
-    await api.post("/api/blogs").send(hasNoTitleHasNoUrl).expect(400);
+    await api
+      .post("/api/blogs")
+      .set("Authorization", "bearer " + (await getFirstUserToken()))
+      .send(hasNoTitleHasNoUrl)
+      .expect(400);
 
     const blogsAtEnd = await helper.blogsInDb();
     expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 2);
@@ -110,7 +128,10 @@ describe("DELETE blog testing", () => {
   test("DELETE existing blog works", async () => {
     const blogsAtStart = await helper.blogsInDb();
     blogToBeDeleted = blogsAtStart[0];
-    await api.delete(`/api/blogs/${blogToBeDeleted.id}`).expect(204);
+    await api
+      .delete(`/api/blogs/${blogToBeDeleted.id}`)
+      .set("Authorization", "bearer " + (await getFirstUserToken()))
+      .expect(204);
 
     const blogsAtEnd = await helper.blogsInDb();
     expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1);
@@ -122,7 +143,10 @@ describe("DELETE blog testing", () => {
   test("DELETE non-existing blog returns 204", async () => {
     const blogsAtStart = await helper.blogsInDb();
     const nonExistendId = "62fcae649d68dcc58d9b7af7";
-    await api.delete(`/api/blogs/${nonExistendId}`).expect(204);
+    await api
+      .delete(`/api/blogs/${nonExistendId}`)
+      .set("Authorization", "bearer " + (await getFirstUserToken()))
+      .expect(204);
 
     const blogsAtEnd = await helper.blogsInDb();
     expect(blogsAtEnd).toHaveLength(blogsAtStart.length);

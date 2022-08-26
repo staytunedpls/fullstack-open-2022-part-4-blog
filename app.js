@@ -27,7 +27,7 @@ app.use(middleware.requestInfoLogger);
 app.use(middleware.tokenExtractor);
 
 app.use("/api/login", LoginRouter);
-app.use("/api/blogs", middleware.userExtractor, BlogsRouter);
+app.use("/api/blogs", BlogsRouter);
 app.use("/api/users", UsersRouter);
 
 app.use(middleware.unknownEndpoint);

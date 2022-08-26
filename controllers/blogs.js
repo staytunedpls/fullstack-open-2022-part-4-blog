@@ -1,7 +1,6 @@
-const jwt = require("jsonwebtoken");
 const BlogsRouter = require("express").Router();
 const Blog = require("../models/blog");
-const User = require("../models/user");
+const middleware = require("../utils/middleware");
 
 BlogsRouter.get("/", async (request, response) => {
   const blogs = await Blog.find({}).populate("user", {
@@ -12,9 +11,9 @@ BlogsRouter.get("/", async (request, response) => {
   response.json(blogs);
 });
 
-BlogsRouter.post("/", async (request, response) => {
+BlogsRouter.post("/", middleware.userExtractor, async (request, response) => {
   const { title, url, author, likes } = request.body;
-  const decodedUser = request.user
+  const decodedUser = request.user;
 
   const blog = new Blog({
     title,
@@ -34,29 +33,33 @@ BlogsRouter.post("/", async (request, response) => {
   response.status(201).json(savedBlog);
 });
 
-BlogsRouter.delete("/:id", async (request, response) => {
-  const blogToDelete = await Blog.findById(request.params.id);
-  if (!blogToDelete) {
-    return response.status(204).end();
+BlogsRouter.delete(
+  "/:id",
+  middleware.userExtractor,
+  async (request, response) => {
+    const blogToDelete = await Blog.findById(request.params.id);
+    if (!blogToDelete) {
+      return response.status(204).end();
+    }
+
+    const decodedUser = request.user;
+
+    if (blogToDelete.user.toString() === decodedUser.id.toString()) {
+      await Blog.findByIdAndRemove(request.params.id);
+
+      decodedUser.blogs = decodedUser.blogs.filter(
+        (blog) => blog._id.toString() !== request.params.id
+      );
+      await decodedUser.save();
+
+      response.status(204).end();
+    } else {
+      response
+        .status(401)
+        .json({ error: "Only a user that has created a blog can delete it" });
+    }
   }
-
-  const decodedUser = request.user
-
-  if (blogToDelete.user.toString() === decodedUser.id.toString()) {
-    await Blog.findByIdAndRemove(request.params.id);
-
-    decodedUser.blogs = decodedUser.blogs.filter(
-      (blog) => blog._id.toString() !== request.params.id
-    );
-    await decodedUser.save();
-
-    response.status(204).end();
-  } else {
-    response
-      .status(401)
-      .json({ error: "Only a user that has created a blog can delete it" });
-  }
-});
+);
 
 BlogsRouter.put("/:id", async (request, response) => {
   const body = request.body;

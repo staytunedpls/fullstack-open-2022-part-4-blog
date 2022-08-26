@@ -18,12 +18,14 @@ const initialUsers = [
   {
     username: "Test username 1",
     name: "Test name 1",
+    password: "Test password 1",
     passwordHash:
       "$2b$10$mXisHVd2PgMdV1fswzbqGewtxWUrm3DUu9ehxR5UoZPdgP7D99eLi",
   },
   {
     username: "Test username 2",
     name: "Test name 2",
+    password: "Test password 2",
     passwordHash:
       "$2b$10$MSDTkPhYqb00Ao6YJQZnUOqExoTYhWF2nYuvi0P80RWnDxqYl4A.S",
   },
