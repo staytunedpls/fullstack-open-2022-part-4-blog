@@ -7,7 +7,9 @@ const blogSchema = new mongoose.Schema({
   },
   url: {
     type: String,
-    required: function() {return !this.title}
+    validate: {
+      validator: (v) => this.url || this.title
+    }
   },
   author: String,
   likes: {
