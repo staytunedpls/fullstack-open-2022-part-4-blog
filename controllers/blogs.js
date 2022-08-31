@@ -23,7 +23,12 @@ BlogsRouter.post("/", middleware.userExtractor, async (request, response) => {
     user: decodedUser._id,
   });
 
-  const savedBlog = await blog.save();
+  const savedBlog = await blog.save()
+  await savedBlog.populate("user", {
+    username: 1,
+    name: 1,
+    _id: 1,
+  });;
   if (!decodedUser.blogs) {
     decodedUser.blogs = [];
   }
