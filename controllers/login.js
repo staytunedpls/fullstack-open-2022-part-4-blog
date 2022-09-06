@@ -28,7 +28,8 @@ LoginRouter.post("/", async (request, response) => {
     token,
     username: authUser.username,
     name: authUser.name,
+    id: authUser.id,
   });
 });
 
-module.exports = LoginRouter
+module.exports = LoginRouter;
