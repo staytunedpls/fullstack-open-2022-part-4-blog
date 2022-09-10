@@ -23,7 +23,8 @@ BlogsRouter.post("/", middleware.userExtractor, async (request, response) => {
     user: decodedUser._id,
   });
 
-  const savedBlog = await blog.save()
+  const savedBlog = await /* It saves the blog to the database. */
+  blog.save()
   await savedBlog.populate("user", {
     username: 1,
     name: 1,
@@ -79,6 +80,14 @@ BlogsRouter.put("/:id", async (request, response) => {
     runValidators: true,
     context: "query",
   });
+  if (!updatedBlog) {
+    return response.status(200).end();
+  }
+  await updatedBlog.populate("user", {
+    username: 1,
+    name: 1,
+    _id: 1,
+  });;
   response.json(updatedBlog);
 });
 
