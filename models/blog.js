@@ -3,13 +3,15 @@ const mongoose = require("mongoose");
 const blogSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: function() {return !this.url}
+    required: function () {
+      return !this.url;
+    },
   },
   url: {
     type: String,
     validate: {
-      validator: (v) => this.url || this.title
-    }
+      validator: (v) => this.url || this.title,
+    },
   },
   author: String,
   likes: {
@@ -18,8 +20,9 @@ const blogSchema = new mongoose.Schema({
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }
+    ref: "User",
+  },
+  comments: { type: mongoose.Schema.Types.Array, default: [] },
 });
 
 blogSchema.set("toJSON", {

@@ -12,7 +12,7 @@ BlogsRouter.get("/", async (request, response) => {
 });
 
 BlogsRouter.post("/", middleware.userExtractor, async (request, response) => {
-  const { title, url, author, likes } = request.body;
+  const { title, url, author, likes, comments } = request.body;
   const decodedUser = request.user;
 
   const blog = new Blog({
@@ -21,15 +21,15 @@ BlogsRouter.post("/", middleware.userExtractor, async (request, response) => {
     author,
     likes,
     user: decodedUser._id,
+    comments: comments,
   });
 
-  const savedBlog = await /* It saves the blog to the database. */
-  blog.save()
+  const savedBlog = await /* It saves the blog to the database. */ blog.save();
   await savedBlog.populate("user", {
     username: 1,
     name: 1,
     _id: 1,
-  });;
+  });
   if (!decodedUser.blogs) {
     decodedUser.blogs = [];
   }
@@ -74,6 +74,7 @@ BlogsRouter.put("/:id", async (request, response) => {
     author: body.author,
     url: body.url,
     likes: body.likes,
+    comments: body.comments,
   };
   const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {
     new: true,
@@ -87,7 +88,30 @@ BlogsRouter.put("/:id", async (request, response) => {
     username: 1,
     name: 1,
     _id: 1,
-  });;
+  });
+  response.json(updatedBlog);
+});
+
+BlogsRouter.post("/:id/comments", async (request, response) => {
+  const comment = request.body.comment;
+  const currentBlog = await Blog.findById(request.params.id);
+  const updatedBlog = await Blog.findByIdAndUpdate(
+    request.params.id,
+    { $push: { comments: comment } },
+    {
+      new: true,
+      runValidators: true,
+      context: "query",
+    }
+  );
+  if (!updatedBlog) {
+    return response.status(200).end();
+  }
+  await updatedBlog.populate("user", {
+    username: 1,
+    name: 1,
+    _id: 1,
+  });
   response.json(updatedBlog);
 });
 
